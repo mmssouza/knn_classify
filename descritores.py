@@ -27,7 +27,7 @@ class contour_base:
     im = oc.imread(fn)
     s = oc.extract_longest_cont(im,nc)
     self.c = np.array([complex(i[0],i[1]) for i in s])
-   elif type(fn) is ndarray:
+   elif type(fn) is np.ndarray:
     self.c = fn
   else:	
    if type(fn) is str:
@@ -115,7 +115,7 @@ class curvatura:
     z = fn
    else:
     z = contour(fn,nc = nc,method = method)
-   caux = [contour(z(),s,nc = 256,method = 'cv') for s in self.sigmas]
+   caux = [contour(z(),s,nc = nc,method = method) for s in self.sigmas]
    caux.append(z)
    self.contours = np.array(caux)
    self.t = np.linspace(0,1,z().size)
@@ -133,7 +133,7 @@ class curvatura:
   def __init__(self,fn = None,sigma_range = np.linspace(2,30,20),nc = 256,method = 'cv'):
    # Extrai contorno da imagem
    self.sigmas = sigma_range
-   self.__Calcula_Curvograma(fn,nc = 256,method = 'cv')
+   self.__Calcula_Curvograma(fn,nc = nc,method = method)
 
  # Function to compute curvature
  # It is called into class constructor
@@ -218,15 +218,15 @@ def dii(fn,raio,nc = 256,method = 'cv'):
 # Centroid distance signature
 def cd(fn,nc = 256,method = 'cv'):
   img_c = contour_base(fn,nc = nc,method = method)
+  print img_c.c.size
   # Calcula distância ao centróide
   dc = np.abs((img_c()-img_c().mean()))
   # m = maior distancia do contorno ao centroide
   m = np.max(dc)
-  m = np.nonzero(dc == m)[0][0]
   # rearranja vetor a partir da maior distancia 
   # e normaliza valores
-  dc = np.r_[dc[m:],dc[0:m-1]]/float(dc[m])
-  return dc
+  #dc = np.r_[dc[m:],dc[0:m-1]]/float(dc[m])
+  return dc/m
 
 # Angle sequence shape signature
 class ass:
@@ -287,7 +287,7 @@ class TAS:
    a = 0.5*(c[i].real*(c[i+ts]-c[i-ts]).imag + c[i+ts].real*(c[i-ts]-c[i]).imag + c[i-ts].real*(c[i]-c[i+ts]).imag)
    ta.append(a)
   ta = np.array(ta)
-  #ta = ta/np.abs(ta).max()
+  ta = ta/np.abs(ta).max()
   return ta
 
  def __init__(self,fn,nc = 256, method = 'cv'):

@@ -9,11 +9,15 @@ def pdist2(X,dist_func):
  p = p + p.transpose()
  return p
 
-def pdist3(X,dist_func,idx):
+def pdist3(X,dist_func,idx,pid):
  N = X.shape[0]
+ print X.shape
  p = scipy.zeros((N,N))
  for i in idx:
   for j in scipy.arange(i,N):
+   try:
     p[i,j] = dist_func(X[i],X[j])
+   except:
+    print i,j,pid
  return  p + p.transpose()
 

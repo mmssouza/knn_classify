@@ -1,23 +1,17 @@
-#!/usr/bin/python
+#!/usr/bin/python -u
 # -*- coding: iso-8859-1 -*-
 import sys
 import cPickle
 import scipy
 from multiprocessing import Queue,Process
-from pdist2 import pdist3
 from oct2py import Oct2Py
-from functools import partial
-
-oc = Oct2Py()
-n = 3
-distancia = partial(Oct2Py().HopDSW,hs = n)
 
 def worker(in_q,out_q):
     args = in_q.get()
     pid = args[0]
     X = args[1]
     idx = args[2]
-    d = pdist3(X,distancia,idx)
+    d = Oct2Py().pdist3(X[:,1:],idx)
     out_q.put([pid,d])
     return
 
@@ -48,10 +42,10 @@ if __name__ == '__main__':
 # print "gerando base de histogramas"
 # vetores de caracteristicas e classes
 #data = scipy.array([scipy.fromstring(db[nome],sep=' ')[0:70] for nome in name_arr])
- data1 = scipy.array([db1[i][1:] for i in db1.keys()])
- data2 = scipy.array([db2[i][1:] for i in db2.keys()])
- data3 = scipy.array([db3[i][1:] for i in db3.keys()])
- data4 = scipy.array([db4[i][1:] for i in db4.keys()])
+ data1 = scipy.delete(scipy.array(db1.values()),0,axis = 1)
+ data2 = scipy.delete(scipy.array(db2.values()),0,axis = 1)
+ data3 = scipy.delete(scipy.array(db3.values()),0,axis = 1)
+ data4 = scipy.delete(scipy.array(db4.values()),0,axis = 1)
 
 
 # Numero de amostras
@@ -60,15 +54,15 @@ if __name__ == '__main__':
  in_q,out_q = Queue(),Queue()
 
  threads = []
- for i in range(2):
+ for i in range(4):
     t =  Process(target=worker,args=(in_q,out_q))
     threads.append(t)
 
  for p in threads:
   p.start()
 
- idx_l = scipy.arange(0,Nobj,2)
- idx_h = scipy.arange(1,Nobj+1,2) 
+ idx_l = scipy.arange(1,Nobj,2)
+ idx_h = scipy.arange(2,Nobj+1,2) 
 # print "Calculando matriz de distancias"
  in_q.put([0,data1,idx_l])
  in_q.put([1,data1,idx_h])
