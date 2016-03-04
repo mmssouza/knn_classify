@@ -7,13 +7,14 @@ from multiprocessing import Queue,Process
 from oct2py import Oct2Py
 
 def worker(in_q,out_q):
-    args = in_q.get()
-    pid = args[0]
-    X = args[1]
-    idx = args[2]
-    d = Oct2Py().pdist3(X[:,1:],idx)
-    out_q.put([pid,d])
-    return
+    while True:
+     args = in_q.get()
+     oc = Oct2Py()  
+     pid = args[0]
+     oc.push(['X','idx'],[args[1],args[2]])
+     d = oc.eval('pdist3(X,idx);')
+     oc.exit()
+     out_q.put([pid,d])
 
 if __name__ == '__main__':
 
@@ -72,6 +73,9 @@ if __name__ == '__main__':
  in_q.put([5,data3,idx_h])
  in_q.put([6,data4,idx_l])
  in_q.put([7,data4,idx_h])
+
+ for p in threads:
+  p.terminate()
  
  
 # pesos das caracteristicas para o cálculo da distância 
