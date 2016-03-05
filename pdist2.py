@@ -1,4 +1,5 @@
 import scipy
+from oct2py import Oct2Py
 
 def pdist2(X,dist_func):
  N = X.shape[0]
@@ -9,15 +10,18 @@ def pdist2(X,dist_func):
  p = p + p.transpose()
  return p
 
-def pdist3(X,dist_func,idx,pid):
+def pdist3(X,idx):
  N = X.shape[0]
- print X.shape
  p = scipy.zeros((N,N))
+ oc = Oct2Py()
  for i in idx:
-  for j in scipy.arange(i,N):
-   try:
-    p[i,j] = dist_func(X[i],X[j])
-   except:
-    print i,j,pid
- return  p + p.transpose()
+  for j in scipy.arange(N):
+   if i != j:
+    try:
+     oc.push(['A','B'],[X[i],X[j]])
+     p[i,j] = oc.eval('HopDSW(A,B,hs = 2);')
+    except:
+     print i,j
+ oc.exit()
+ return p
 
