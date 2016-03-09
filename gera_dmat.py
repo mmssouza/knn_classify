@@ -7,15 +7,14 @@ from multiprocessing import Queue,Process
 from pdist2 import pdist3
 
 def worker(in_q,out_q):
-    while True:
-     args = in_q.get()
-     d = pdist3(args[0],args[1])
-     out_q.put(d)
+  args = in_q.get()
+  pdist3(args[0],args[1],out_q)
       
 if __name__ == '__main__':
 # Matriz de amostras x atributos
  db = cPickle.load(open(sys.argv[1]))
  data1 = scipy.array(db.values())[:,1:]
+# data1 = scipy.rand(40,125)
 # Numero de amostras
  Nobj = data1.shape[0]
 # Numero de partições de data1 para processamento paralelo
@@ -27,7 +26,6 @@ if __name__ == '__main__':
  limits_hi= scipy.linspace(Nobj/Npart,Nobj,Npart).astype(int)
  limits_lo = scipy.linspace(0,Nobj,Npart,endpoint = False).astype(int)
  idx =[scipy.arange(lo,hi) for lo,hi in zip(limits_lo,limits_hi)]
- print idx
 
 # Filas para comunicar com threads
  in_q,out_q = Queue(),Queue()
@@ -39,24 +37,37 @@ if __name__ == '__main__':
 
  for p in threads:
   p.start()
- 
+  
 # Passa matriz e indices para que cada thread calcule 
 # uma parte da matriz de distâncias
  for i in idx:
   in_q.put([data1,i])
  
+ aux = 0;
+ f = open(sys.argv[2],"wb")
+ while aux != Ncpu:
+  a = out_q.get()
+  print a
+  if a[0] == -1:
+   aux = aux + 1   
+   pass
+  cPickle.dump(a,f)
+ f.close()
 # Aqui vai dormir, acordando para cada resultado
 # parcial 
- l = [out_q.get() for i in scipy.arange(len(idx))]
+# l = [out_q.get() for i in scipy.arange(len(idx))]
 
+# for p in threads:
+#  p.terminate()
+ 
  for p in threads:
   p.terminate()
-
+  
 # Calcula matriz de distancias
- dmat = scipy.zeros((Nobj,Nobj))
- for d in l:
-  dmat = dmat + d
+# dmat = scipy.zeros((Nobj,Nobj))
+# for d in l:
+#  dmat = dmat + d
 # Salva resultado
- with open(sys.argv[1],'wb') as f:
-  cPickle.dump(dmat, f)
-  cPickle.dump(db,f) 
+# with open(sys.argv[1],'wb') as f:
+#  cPickle.dump(dmat, f)
+#  cPickle.dump(db,f) 
