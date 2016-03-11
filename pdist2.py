@@ -1,5 +1,6 @@
 import scipy
-from oct2py import Oct2Py
+#from oct2py import Oct2Py
+from fastdtw import fastdtw
 
 def pdist2(X,dist_func):
  N = X.shape[0]
@@ -13,16 +14,11 @@ def pdist2(X,dist_func):
 def pdist3(X,idx,q):
  N = X.shape[0]
  p = scipy.zeros((N,N))
- oc = Oct2Py()
  for i in idx:
-  for j in scipy.arange(N):
+  for j in scipy.arange(i,N):
    if i != j:
-    try:
-     oc.push(['A','B'],[X[i],X[j]])
-     p[i,j] = oc.eval('HopDSW(A,B,hs = 2);')
-    except:
-     print i,j
+    p[i,j] = fastdtw(X[i],X[j])[0]
+  print i
   q.put(scipy.hstack((i,p[i]))) 	  
  q.put(scipy.hstack((-1,scipy.zeros(N)))) 
- oc.exit()
 

@@ -18,9 +18,9 @@ if __name__ == '__main__':
 # Numero de amostras
  Nobj = data1.shape[0]
 # Numero de partições de data1 para processamento paralelo
- Npart = 2
+ Npart = 7 
 # Cpu's empregadas no cálculo
- Ncpu = 2
+ Ncpu = 7 
 
 # Gera as partições (Npart listas de indices das linhas de data1)
  limits_hi= scipy.linspace(Nobj/Npart,Nobj,Npart).astype(int)
