@@ -4,41 +4,40 @@ import sys
 import cPickle
 import scipy
 
+def gera_mat(fname):
+  f = open(fname,'rb')
+  labels = cPickle.load(f)
+  md = []
+  while True:
+   try: 
+    md.append(cPickle.load(f))
+   except:
+    break
+  f.close()
+  md = scipy.array(md)
+  idx = scipy.argsort(md[:,0])
+  md = md[idx]
+  #md = scipy.delete(md[idx],scipy.s_[0:1],axis = 0)
+  md = scipy.delete(md,0,axis = 1)
+  md = md + md.T
+  return md,labels
+
 if __name__ == '__main__':
- f = open(sys.argv[1],'rb')
- md = cPickle.load(f)
- db = cPickle.load(f)
- f.close()
-
- # nome das figuras
- name_arr = scipy.array(db1.keys())
-
-# dicionario {nome das figuras : classes}
- cl = dict(zip(name_arr,[db1[n][0] for n in name_arr]))
+ 
+ md,cl = gera_mat(sys.argv[1])
+ Nobj = md.shape[0]
+ Nretr = 40
 
 # Acumulador para contabilizar desempenho do experimento
- tt = 0
+ tt = 0.
 
  #print "Calculando bull eye score"
- for i,nome in zip(scipy.arange(Nobj),name_arr):
- # Para cada linha de md estabelece rank de recuperação
- # ordenando a linha em ordem crescente de similaridade 
- # O primeiro elemento da linha corresponde a forma modelo
+ for i in scipy.arange(Nobj):
   idx = scipy.argsort(md[i])
- # pega classe a qual pertence a imagem modelo
-  classe_padrao = cl[nome]
-# nome das imagens recuperadas em ordem crescente de similaridade
-  name_retr = name_arr[idx]
- # pega classes a qual pertencem as imagens recuperadas
-  aux = [cl[j] for j in name_retr]
-  # estamos interessados apenas nos Nretr (40) resultados
-  classe_retrs = aux[0:Nretr]
-  # Contabiliza desempenho contando o número de formas da mesma classe
-  # do modelo (tp) dentre as 40 recuperadas
-  # Atualiza o resultado acumulado (tt)
-  n = scipy.nonzero(scipy.array(classe_retrs) == classe_padrao)
-  tp = float(n[0].size)
-  tt = tt + tp
+  classe_retrs = (cl[idx])[0:Nretr]
+  n = scipy.nonzero(scipy.array(classe_retrs) == cl[i])
+  tt = tt + float(n[0].size)
     
 # Bull eye
+ print 20*1400,tt
  print tt/float(1400*20)  
