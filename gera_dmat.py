@@ -29,7 +29,7 @@ if __name__ == '__main__':
  Ncpu = 2
 # Gera as partições (Npart listas de indices das linhas de data1)
  limits_hi= scipy.linspace(Nobj/Ncpu,Nobj,Ncpu).astype(int)
- limits_lo = scipy.linspace(0,Nobj,Ncpu,endpoint = False).astype(int)
+ limits_lo = np.hstack((0,limits_hi[0:limits_hi.shape[0]-1]))
  idx =[scipy.arange(lo,hi) for lo,hi in zip(limits_lo,limits_hi)]
 
 # Filas para comunicar com threads
