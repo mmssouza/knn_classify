@@ -22,7 +22,7 @@ if __name__ == '__main__':
  cPickle.dump(labels,f)
 # data1 = scipy.rand(40,125)
 # Numero de amostras
- data1 = scipy.array([histogram(x[1:],bins = 50,range = (0.,1.),normed = True)[0] for x in db.values()])
+ data1 = scipy.array(db.values())[:,1:]
  Nobj = data1.shape[0]
 # Cpu's empregadas no cálculo
  #Ncpu = multiprocessing.cpu_count()

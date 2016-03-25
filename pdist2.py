@@ -17,7 +17,7 @@ def pdist3(X,idx,q):
  for i in idx:
   for j in scipy.arange(i,N):
    if i != j:
-    p[i,j] = fastdtw(X[i],X[j])[0]
+    p[i,j] = fastdtw(X[i],X[j],radius = 20)[0]
     #p[i,j] = sqeuclidean(X[i],X[j])
   print i
   q.put(scipy.hstack((i,p[i]))) 	  
